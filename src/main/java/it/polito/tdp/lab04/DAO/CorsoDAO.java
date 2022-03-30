@@ -35,9 +35,13 @@ public class CorsoDAO {
 				int periodoDidattico = rs.getInt("pd");
 
 				System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
-
+				
 				// Crea un nuovo JAVA Bean Corso
 				// Aggiungi il nuovo oggetto Corso alla lista corsi
+				
+				Corso c = new Corso(codins, numeroCrediti, nome, periodoDidattico);
+				corsi.add(c);
+				
 			}
 
 			conn.close();
@@ -55,15 +59,48 @@ public class CorsoDAO {
 	/*
 	 * Dato un codice insegnamento, ottengo il corso
 	 */
-	public void getCorso(Corso corso) {
-		// TODO
+	public Corso getCorso(String codiceInsegnamento) {
+		String sql = "SELECT * "
+				+ "FROM corso "
+				+ "WHERE codins = ?";
+		
+		
+		return null;
 	}
 
 	/*
 	 * Ottengo tutti gli studenti iscritti al Corso
 	 */
-	public void getStudentiIscrittiAlCorso(Corso corso) {
-		// TODO
+	public List<Studente> getStudentiIscrittiAlCorso(String codiceCorso) {
+		List<Studente> studenti = new LinkedList<Studente>();
+		
+		final String sql = "SELECT * "
+				+ "FROM iscrizione i, studente s "
+				+ "WHERE i.matricola=s.matricola AND codins = ?";
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, codiceCorso);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				
+				Integer matricola = rs.getInt("matricola");
+				String cognome = rs.getString("cognome");
+				String nome = rs.getString("nome");
+				String CDS = rs.getString("CDS");
+				
+				Studente s = new Studente(matricola, cognome, nome, CDS);
+				System.out.println(s.toString());
+				studenti.add(s);
+				
+			}
+			conn.close();
+			return studenti;
+			
+		}catch(SQLException e){
+			throw new RuntimeException("Errore Db", e);
+		}
 	}
 
 	/*
